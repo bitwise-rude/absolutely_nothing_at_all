@@ -9,7 +9,6 @@ from PIL import Image
 from io import BytesIO
 import re
 import numpy as np
-import face_recognition
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
