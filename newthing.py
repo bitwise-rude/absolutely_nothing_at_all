@@ -1066,4 +1066,5 @@ if __name__ == '__main__':
         worker_thread = threading.Thread(target=image_worker)
         worker_thread.daemon = True
         worker_thread.start()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))  # default to 5000 for local dev
+    app.run(host='0.0.0.0', port=port)
