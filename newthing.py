@@ -49,10 +49,9 @@ import json
 import re
 import time
 
+import re
+
 def parse_student_data():
-    # Initialize Groq client (put your API key here)
-    client = Groq(api_key="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")
-    
     all_students = {}
     pattern = r'PUL\d{3}(BCE|BEL|BCT|BEI|BME|BCH|BAS|BAR)\d{3}'
     lines = all_data.splitlines()
@@ -62,102 +61,131 @@ def parse_student_data():
             try:
                 roll_no = match.group(0)
                 roll_index = line.find(roll_no)
-                section = line[roll_index:].strip()
+                section = line[roll_index + len(roll_no):].strip()
                 
-                # Create prompt for Groq
-                messages = [
-                    {
-                        "role": "system",
-                        "content": "You are a data extraction expert. Extract student information and return ONLY valid JSON. Be precise and don't guess missing information."
-                    },
-                    {
-                        "role": "user", 
-                        "content": f"""Extract student data from this text and return ONLY valid JSON:
-
-{section}
-
-Return JSON with these exact fields (use null for missing data):
-{{
-  "Name": "",
-  "Gender": "",
-  "FatherName": "",
-  "MotherName": "",
-  "DOB": "",
-  "Phone": "",
-  "Department": "",
-  "ProgramType": "",
-  "RollNo": "{roll_no}",
-  "Country": "",
-  "District": "",
-  "Municipality": "",
-  "Grade10School": "",
-  "Grade10Year": "",
-  "Grade10GPA": "",
-  "Grade12School": "",
-  "Grade12Year": "",
-  "Grade12ExamYear": "",
-  "Grade12GPA": "",
-  "Grade12Roll": ""
-}}"""
-                    }
-                ]
+                # Split by common separators to get data chunks
+                parts = re.split(r'\s+', section)
                 
-                # Get response from Groq (super fast!)
-                chat_completion = client.chat.completions.create(
-                    messages=messages,
-                    model="llama3-8b-8192",  # Current available model
-                    temperature=0,
-                    max_tokens=1000
-                )
+                # Initialize data
+                student_data = {
+                    'RollNo': roll_no,
+                    'Name': None,
+                    'Gender': None,
+                    'FatherName': None,
+                    'MotherName': None,
+                    'DOB': None,
+                    'Phone': None,
+                    'Department': None,
+                    'ProgramType': None,
+                    'Country': None,
+                    'District': None,
+                    'Municipality': None,
+                    'Grade10School': None,
+                    'Grade10Year': None,
+                    'Grade10GPA': None,
+                    'Grade12School': None,
+                    'Grade12Year': None,
+                    'Grade12ExamYear': None,
+                    'Grade12GPA': None,
+                    'Grade12Roll': None
+                }
                 
-                response_text = chat_completion.choices[0].message.content.strip()
+                # Department detection (always at the beginning)
+                dept_names = {
+                    'BCE': 'Civil Engineering',
+                    'BEL': 'Electrical Engineering', 
+                    'BCT': 'Computer Engineering',
+                    'BEI': 'Electronics Engineering',
+                    'BME': 'Mechanical Engineering',
+                    'BCH': 'Chemical Engineering',
+                    'BAS': 'Aerospace',
+                    'BAR': 'Architecture'
+                }
+                dept_code = re.search(r'(BCE|BEL|BCT|BEI|BME|BCH|BAS|BAR)', roll_no).group()
+                student_data['Department'] = dept_names.get(dept_code)
                 
-                # Debug: print raw response for first few students
-                if len(all_students) < 3:
-                    print(f"Raw response for {roll_no}: {response_text}")
+                # Program type (Regular/Full Fee)
+                if 'Regular' in section:
+                    student_data['ProgramType'] = 'Regular'
+                elif 'Full Fee' in section:
+                    student_data['ProgramType'] = 'Full Fee'
                 
-                # Clean response (remove markdown if present)
-                if response_text.startswith('```json'):
-                    response_text = response_text[7:]
-                    if response_text.endswith('```'):
-                        response_text = response_text[:-3]
-                elif response_text.startswith('```'):
-                    response_text = response_text[3:]
-                    if response_text.endswith('```'):
-                        response_text = response_text[:-3]
+                # Date of birth (format: d/dd/dddd or dd/dd/dddd)
+                dob_match = re.search(r'\b(\d{1,2}/\d{1,2}/\d{4})\b', section)
+                if dob_match:
+                    student_data['DOB'] = dob_match.group(1)
                 
-                # Remove any extra text before/after JSON
-                response_text = response_text.strip()
+                # Gender
+                if ' Male ' in section:
+                    student_data['Gender'] = 'Male'
+                elif ' Female ' in section:
+                    student_data['Gender'] = 'Female'
                 
-                # Find JSON object in response
-                start_idx = response_text.find('{')
-                end_idx = response_text.rfind('}') + 1
+                # Phone number (10 digits)
+                phone_match = re.search(r'\b(\d{10})\b', section)
+                if phone_match:
+                    student_data['Phone'] = phone_match.group(1)
                 
-                if start_idx != -1 and end_idx > start_idx:
-                    json_text = response_text[start_idx:end_idx]
-                else:
-                    print(f"No JSON found in response for {roll_no}")
-                    continue
+                # Country (usually Nepal)
+                if 'Nepal' in section:
+                    student_data['Country'] = 'Nepal'
                 
-                # Parse JSON and store
-                student_data = json.loads(json_text)
+                # Name extraction (between program type and DOB)
+                name_pattern = r'(?:Regular|Full Fee)\s+([A-Z\s]+?)\s+\1\s+\d{1,2}/\d{1,2}/\d{4}'
+                name_match = re.search(name_pattern, section)
+                if name_match:
+                    student_data['Name'] = name_match.group(1).strip()
+                
+                # Parent names (after gender, before phone/Nepal)
+                if student_data['Gender']:
+                    gender_pos = section.find(student_data['Gender'])
+                    after_gender = section[gender_pos + len(student_data['Gender']):].strip()
+                    
+                    # Extract parent names (uppercase words before phone/Nepal)
+                    parent_text = re.search(r'^([A-Z\s]+?)(?:\s*\d{10}|\s*Nepal)', after_gender)
+                    if parent_text:
+                        parent_names = parent_text.group(1).strip().split()
+                        if len(parent_names) >= 4:  # Likely father + mother names
+                            mid = len(parent_names) // 2
+                            student_data['FatherName'] = ' '.join(parent_names[:mid])
+                            student_data['MotherName'] = ' '.join(parent_names[mid:])
+                
+                # Location (District and Municipality after Nepal)
+                nepal_match = re.search(r'Nepal\s+([A-Za-z]+)(?:\s+([A-Za-z\s]+?))?(?:\s+\d+|\s+Nepal\s+Gov|\s+Private)', section)
+                if nepal_match:
+                    student_data['District'] = nepal_match.group(1)
+                    if nepal_match.group(2):
+                        student_data['Municipality'] = nepal_match.group(2).strip()
+                
+                # Grade 10 info (Nepal Gov/Private + School + Year + BS + GPA)
+                grade10_match = re.search(r'(?:Nepal\s+Gov\s+|Private\s+)?([A-Za-z\s]+?School)\s+(\d{4})\s+BS\s+(\d+\.?\d*)', section)
+                if grade10_match:
+                    student_data['Grade10School'] = grade10_match.group(1).strip()
+                    student_data['Grade10Year'] = grade10_match.group(2)
+                    student_data['Grade10GPA'] = float(grade10_match.group(3))
+                
+                # Grade 12 info (Roll + Board + School + Year + BS + GPA)
+                # Handle different roll number formats
+                grade12_matches = list(re.finditer(r'(\d{6,8})\s*([A-Z])?\s+(HSEB/NEB|NEB)\s+([A-Za-z\s&]+?)\s+(\d{4})\s+BS\s+(\d+\.?\d*)', section))
+                if grade12_matches:
+                    match = grade12_matches[0]  # Take first match
+                    roll_num = match.group(1)
+                    letter = match.group(2) if match.group(2) else ''
+                    student_data['Grade12Roll'] = roll_num + (' ' + letter if letter else '')
+                    student_data['Grade12School'] = match.group(4).strip()
+                    student_data['Grade12Year'] = match.group(5)
+                    student_data['Grade12GPA'] = float(match.group(6))
+                
                 all_students[roll_no] = student_data
+                print(f"✓ Parsed {roll_no}")
                 
-                print(f"Parsed {roll_no} successfully")
-                
-                # Very small delay (Groq is fast and has generous limits)
-                time.sleep(0.05)
-                
-            except json.JSONDecodeError as e:
-                print(f"JSON decode error for {roll_no}: {e}")
-                print(f"Cleaned response: {json_text if 'json_text' in locals() else response_text}")
-                continue
             except Exception as e:
                 print(f"Error parsing data for {roll_no}: {e}")
                 continue
     
     print(f"Parsed {len(all_students)} student records")
     return all_students
+    
 all_students=parse_student_data()
 def get_student_info(roll_no):
     return all_students.get(roll_no, {})
