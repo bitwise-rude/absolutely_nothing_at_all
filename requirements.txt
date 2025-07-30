@@ -5,4 +5,4 @@ Pillow
 numpy
 gunicorn
 google-generativeai
-
+groq
