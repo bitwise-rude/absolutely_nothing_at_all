@@ -1,5 +1,3 @@
-
-            <!--ko khate mero code pardna ayo pheri khate ja uta -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,7 +68,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: transform 0.2s;
             background-color: #eee;
-            height: 150px; /* Fixed height to match image */
+            height: 150px;
         }
         .image-container:hover {
             transform: translateY(-5px);
@@ -221,54 +219,55 @@
     </div> 
     <div class="search-container">
         <input type="text" id="search-input" class="search-input" placeholder="Search By Name or Roll Number">
-
         <button id="search-btn" class="search-btn">Search</button>
-
-   
     </div>
-         <div class="face-search-container" style="margin-top: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 5px; background-color: #f9f9f9;">
-    <h3>Search by Face</h3>
-    <form id="face-upload-form" enctype="multipart/form-data">
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="file" id="face-input" accept="image/*" style="flex-grow: 1;">
-            <button type="submit" class="btn btn-primary">Find Matches</button>
-        </div>
-    </form>
-    <div id="face-preview" style="margin-top: 10px; display: none;">
-        <h4>Uploaded Image:</h4>
-        <img id="preview-image" style="max-width: 200px; max-height: 200px; margin-top: 10px;">
-    </div>
-    <div id="face-results" style="margin-top: 20px; display: none;">
-        <h4>Top Matches:</h4>
-        <div id="face-results-container" class="gallery" style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));">
-        </div>
-    </div>
-</div>
-<div class="filters">
-    <select id="gender-filter" class="filter-select">
-        <option value="">All Genders</option>
-    </select>
-    <select id="department-filter" class="filter-select">
-        <option value="">All Departments</option>
-    </select>
     
-    <select id="program-filter" class="filter-select">
-        <option value="">All Programs</option>
-    </select>
-    <select id="batch-filter" class="filter-select">
-        <option value="">All Batches</option>
-    </select>
-    <button id="apply-filters" class="filter-btn">Apply Filters</button>
-    <button id="reset-filters" class="filter-btn">Reset Filters</button>
-</div>
+    <div class="face-search-container" style="margin-top: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 5px; background-color: #f9f9f9;">
+        <h3>Search by Face</h3>
+        <form id="face-upload-form" enctype="multipart/form-data">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="file" id="face-input" accept="image/*" style="flex-grow: 1;">
+                <button type="submit" class="btn btn-primary">Find Matches</button>
+            </div>
+        </form>
+        <div id="face-preview" style="margin-top: 10px; display: none;">
+            <h4>Uploaded Image:</h4>
+            <img id="preview-image" style="max-width: 200px; max-height: 200px; margin-top: 10px;">
+        </div>
+        <div id="face-results" style="margin-top: 20px; display: none;">
+            <h4>Top Matches:</h4>
+            <div id="face-results-container" class="gallery" style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));">
+            </div>
+        </div>
+    </div>
+
+    <div class="filters">
+        <select id="gender-filter" class="filter-select">
+            <option value="">All Genders</option>
+        </select>
+        <select id="department-filter" class="filter-select">
+            <option value="">All Departments</option>
+        </select>
+        <select id="program-filter" class="filter-select">
+            <option value="">All Programs</option>
+        </select>
+        <select id="batch-filter" class="filter-select">
+            <option value="">All Batches</option>
+        </select>
+        <button id="apply-filters" class="filter-btn">Apply Filters</button>
+        <button id="reset-filters" class="filter-btn">Reset Filters</button>
+    </div>
+    
     <div class="status">
         <div class="progress">
             <div id="progress-bar" class="progress-bar" style="width: 0%">0%</div>
         </div>
         <p id="status-text">Ready to start processing...</p>
     </div>
+    
     <div class="gallery" id="gallery">
     </div>
+    
     <div class="modal" id="image-modal">
         <span class="close" id="close-modal">&times;</span>
         <div class="modal-content">
@@ -285,51 +284,53 @@
             </div>
         </div>
     </div>
+    
     <script>
         function loadFilterOptions() {
-    fetch('/get-filter-options')
-        .then(response => response.json())
-        .then(data => {
-            const genderFilter = document.getElementById('gender-filter');
-            const departmentFilter = document.getElementById('department-filter');
-            const programFilter = document.getElementById('program-filter');
-            const batchFilter = document.getElementById('batch-filter');
-            genderFilter.options.length = 1;
-            departmentFilter.options.length = 1;
-            programFilter.options.length = 1;
-            batchFilter.options.length = 1;
-            data.genders.forEach(gender => {
-                const option = document.createElement('option');
-                option.value = gender;
-                option.textContent = gender;
-                genderFilter.appendChild(option);
-            });
-            data.departments.forEach(department => {
-                const option = document.createElement('option');
-                option.value = department;
-                option.textContent = department;
-                departmentFilter.appendChild(option);
-            });
-            data.programs.forEach(program => {
-                const option = document.createElement('option');
-                option.value = program;
-                option.textContent = program;
-                programFilter.appendChild(option);
-            });
-            data.batches.forEach(batch => {
-                const option = document.createElement('option');
-                option.value = batch;
-                option.textContent = "Batch " + batch;
-                batchFilter.appendChild(option);
-            });
-        })
-        .catch(error => console.error('Error loading filter options:', error));
-}
+            fetch('/get-filter-options')
+                .then(response => response.json())
+                .then(data => {
+                    const genderFilter = document.getElementById('gender-filter');
+                    const departmentFilter = document.getElementById('department-filter');
+                    const programFilter = document.getElementById('program-filter');
+                    const batchFilter = document.getElementById('batch-filter');
+                    genderFilter.options.length = 1;
+                    departmentFilter.options.length = 1;
+                    programFilter.options.length = 1;
+                    batchFilter.options.length = 1;
+                    data.genders.forEach(gender => {
+                        const option = document.createElement('option');
+                        option.value = gender;
+                        option.textContent = gender;
+                        genderFilter.appendChild(option);
+                    });
+                    data.departments.forEach(department => {
+                        const option = document.createElement('option');
+                        option.value = department;
+                        option.textContent = department;
+                        departmentFilter.appendChild(option);
+                    });
+                    data.programs.forEach(program => {
+                        const option = document.createElement('option');
+                        option.value = program;
+                        option.textContent = program;
+                        programFilter.appendChild(option);
+                    });
+                    data.batches.forEach(batch => {
+                        const option = document.createElement('option');
+                        option.value = batch;
+                        option.textContent = "Batch " + batch;
+                        batchFilter.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading filter options:', error));
+        }
+
         function updateGallery() {
             const gender = document.getElementById('gender-filter').value;
             const department = document.getElementById('department-filter').value;
             const program = document.getElementById('program-filter').value;
-                const batch = document.getElementById('batch-filter').value;
+            const batch = document.getElementById('batch-filter').value;
             let url = '/get-images';
             const params = new URLSearchParams();
             if (gender) params.append('gender', gender);
@@ -358,16 +359,16 @@
                     gallery.innerHTML = '';
 
                     const sortedEntries = Object.entries(images).sort((a, b) => {
-    const batchA = a[0].substring(0, 3);
-    const batchB = b[0].substring(0, 3);
-    
-    if (batchA === '081' && batchB !== '081') return -1;
-    if (batchA !== '081' && batchB === '081') return 1;
-    if (batchA === '080' && batchB !== '080' && batchB !== '081') return -1;
-    if (batchA !== '080' && batchA !== '081' && batchB === '080') return 1;
-    
-    return 0;
-});
+                        const batchA = a[0].substring(0, 3);
+                        const batchB = b[0].substring(0, 3);
+                        
+                        if (batchA === '081' && batchB !== '081') return -1;
+                        if (batchA !== '081' && batchB === '081') return 1;
+                        if (batchA === '080' && batchB !== '080' && batchB !== '081') return -1;
+                        if (batchA !== '080' && batchA !== '081' && batchB === '080') return 1;
+                        
+                        return 0;
+                    });
                     
                     for (const [rollNo, imagePath] of sortedEntries) {
                         const container = document.createElement('div');
@@ -386,6 +387,7 @@
                 })
                 .catch(error => console.error('Error fetching images:', error));
         }
+
         function fetchStudentDetails(rollNo) {
             document.getElementById('loading-details').style.display = 'block';
             document.getElementById('loading-details').textContent = 'Loading student information...';
@@ -404,8 +406,20 @@
                         headerRow.innerHTML = '<th>Field</th><th>Value</th>';
                         detailsTable.appendChild(headerRow);
                         
-                        for (const [key, value] of Object.entries(data.data)) {
-                            if (value && String(value).trim() !== '') {
+                        // Define the order of fields to display
+                        const fieldOrder = [
+                            'RollNo', 'Name', 'Gender', 'DOB', 'Phone',
+                            'FatherName', 'MotherName', 
+                            'Country', 'District', 'Municipality',
+                            'Department', 'ProgramType',
+                            'Grade10School', 'Grade10Year', 'Grade10GPA',
+                            'Grade12School', 'Grade12Year', 'Grade12GPA', 'Grade12Roll'
+                        ];
+                        
+                        // Display fields in the specified order
+                        fieldOrder.forEach(key => {
+                            const value = data.data[key];
+                            if (value && String(value).trim() !== '' && String(value) !== 'null' && String(value) !== 'None') {
                                 const row = document.createElement('tr');
                                 row.innerHTML = `
                                     <td>${key}</td>
@@ -413,7 +427,20 @@
                                 `;
                                 detailsTable.appendChild(row);
                             }
-                        }  
+                        });
+                        
+                        // Add any remaining fields that weren't in the order list
+                        for (const [key, value] of Object.entries(data.data)) {
+                            if (!fieldOrder.includes(key) && value && String(value).trim() !== '' && String(value) !== 'null' && String(value) !== 'None') {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${key}</td>
+                                    <td>${value}</td>
+                                `;
+                                detailsTable.appendChild(row);
+                            }
+                        }
+                        
                         loadingDetails.style.display = 'none';
                         detailsTable.style.display = 'table';
                     } else {
@@ -425,136 +452,138 @@
                     document.getElementById('loading-details').textContent = 'Error loading student details';
                 });
         }
- function showModal(rollNo, imagePath) {
-    const modal = document.getElementById('image-modal');
-    const modalImage = document.getElementById('modal-image');
-    const modalRollNo = document.getElementById('modal-roll-no');
-    const imageContainer = document.querySelector('.modal-image-container');
-    modalRollNo.textContent = 'Roll Number: ' + rollNo;
-    if (imagePath) {
-        modalImage.src = imagePath;
-        modalImage.style.display = 'block';
-        modalImage.onerror = function() {
-            this.style.display = 'none';
-            imageContainer.innerHTML += '<div class="image-error" style="padding: 30px;">Image not available</div>';
-        };
-    } else {
-        modalImage.style.display = 'none';
-        imageContainer.innerHTML = '<div class="image-error" style="padding: 30px;">Image not available</div>';
-    }
-    
-    fetchStudentDetails(rollNo);
-    modal.style.display = 'flex';
-}   
-function searchStudent() {
-    const searchInput = document.getElementById('search-input');
-    const searchTerm = searchInput.value.trim().toUpperCase();
-    if (!searchTerm) return;
-const isRollNumber = /(?:\d{3}[A-Z]{3}\d{3})/i.test(searchTerm);
-    console.log(searchTerm);
-    if (isRollNumber) {
-        let rollNoToUse = searchTerm;
-        if (!searchTerm.startsWith('PUL') && searchTerm.length === 6) {
-            rollNoToUse = `PUL${searchTerm}`;
-        }
-        fetch(`/get-student-details/${rollNoToUse}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    const rollNoWithoutPrefix = rollNoToUse.replace('PUL', '');
-                    fetch('/get-images')
-                        .then(response => response.json())
-                        .then(imageData => {
-                            const imagePath = imageData.images[rollNoWithoutPrefix];
-                            showModal(rollNoToUse, imagePath ? `/${imagePath}` : '');
-                        })
-                        .catch(error => {
-                            console.error('Error fetching image:', error);
-                            showModal(rollNoToUse, '');
-                        });
-                } else {
-                    alert('No student found with this roll number');
-                }
-            })
-            .catch(error => {
-                console.error('Error searching by roll number:', error);
-                alert('Error searching. Please try again.');
-            });
-    } else {
-        searchByName(searchTerm);
-    }
-}
-function searchByName(name) {
-    name = name.trim().toUpperCase();
-    if (!name) return;
 
-    // Use the existing search API endpoint instead of manually checking all images
-    fetch(`/search-students?term=${encodeURIComponent(name)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success' && data.results.length > 0) {
-                const students = data.results;
-                
-                if (students.length === 1) {
-                    // If only one student found, show their modal directly
-                    showModal(students[0].rollNo, students[0].imagePath ? `/${students[0].imagePath}` : null);
-                } else {
-                    // If multiple students found, show selection modal
-                    showStudentSelectionModal(students.map(student => ({
-                        rollNo: student.rollNo,
-                        imagePath: student.imagePath,
-                        name: student.name || 'Unknown'
-                    })));
-                }
+        function showModal(rollNo, imagePath) {
+            const modal = document.getElementById('image-modal');
+            const modalImage = document.getElementById('modal-image');
+            const modalRollNo = document.getElementById('modal-roll-no');
+            const imageContainer = document.querySelector('.modal-image-container');
+            modalRollNo.textContent = 'Roll Number: ' + rollNo;
+            if (imagePath) {
+                modalImage.src = imagePath;
+                modalImage.style.display = 'block';
+                modalImage.onerror = function() {
+                    this.style.display = 'none';
+                    imageContainer.innerHTML += '<div class="image-error" style="padding: 30px;">Image not available</div>';
+                };
             } else {
-                alert('No students found with this name');
+                modalImage.style.display = 'none';
+                imageContainer.innerHTML = '<div class="image-error" style="padding: 30px;">Image not available</div>';
             }
-        })
-        .catch(error => {
-            console.error('Error searching by name:', error);
-            alert('Error searching. Please try again.');
-        });
-}
-function showStudentSelectionModal(students) {
-    const selectionModal = document.createElement('div');
-    selectionModal.className = 'modal';
-    selectionModal.style.display = 'flex';
-    selectionModal.innerHTML = `
-        <div class="modal-content" style="width: 80%; max-width: 600px;">
-            <h2>Multiple Students Found</h2>
-            <p>Please select a student:</p>
-            <div class="student-list" style="max-height: 400px; overflow-y: auto;"></div>
-            <button class="btn btn-danger" style="margin-top: 15px;">Cancel</button>
-        </div>
-    `;
-    const studentList = selectionModal.querySelector('.student-list');
-    students.forEach(student => {
-        const studentItem = document.createElement('div');
-        studentItem.style.cssText = 'display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #ddd; cursor: pointer;';
-        let imgHtml = '';
-        if (student.imagePath) {
-            imgHtml = `<img src="/${student.imagePath}" style="width: 50px; height: 50px; margin-right: 15px; object-fit: cover;">`;
-        } else {
-            imgHtml = `<div style="width: 50px; height: 50px; margin-right: 15px; background-color: #eee; display: flex; align-items: center; justify-content: center;">No img</div>`;
+            
+            fetchStudentDetails(rollNo);
+            modal.style.display = 'flex';
+        }   
+
+        function searchStudent() {
+            const searchInput = document.getElementById('search-input');
+            const searchTerm = searchInput.value.trim().toUpperCase();
+            if (!searchTerm) return;
+            const isRollNumber = /(?:\d{3}[A-Z]{3}\d{3})/i.test(searchTerm);
+            console.log(searchTerm);
+            if (isRollNumber) {
+                let rollNoToUse = searchTerm;
+                if (!searchTerm.startsWith('PUL') && searchTerm.length === 6) {
+                    rollNoToUse = `PUL${searchTerm}`;
+                }
+                fetch(`/get-student-details/${rollNoToUse}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            const rollNoWithoutPrefix = rollNoToUse.replace('PUL', '');
+                            fetch('/get-images')
+                                .then(response => response.json())
+                                .then(imageData => {
+                                    const imagePath = imageData.images[rollNoWithoutPrefix];
+                                    showModal(rollNoToUse, imagePath ? `/${imagePath}` : '');
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching image:', error);
+                                    showModal(rollNoToUse, '');
+                                });
+                        } else {
+                            alert('No student found with this roll number');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error searching by roll number:', error);
+                        alert('Error searching. Please try again.');
+                    });
+            } else {
+                searchByName(searchTerm);
+            }
         }
-        studentItem.innerHTML = `
-            ${imgHtml}
-            <div>
-                <div><strong>${student.name}</strong></div>
-                <div>${student.rollNo}</div>
-            </div>
-        `;
-        studentItem.addEventListener('click', () => {
-            document.body.removeChild(selectionModal);
-            showModal(student.rollNo, student.imagePath ? `/${student.imagePath}` : '');
-        });
-        studentList.appendChild(studentItem);
-    });
-    selectionModal.querySelector('button').addEventListener('click', () => {
-        document.body.removeChild(selectionModal);
-    });
-    document.body.appendChild(selectionModal);
-}
+
+        function searchByName(name) {
+            name = name.trim().toUpperCase();
+            if (!name) return;
+
+            fetch(`/search-students?term=${encodeURIComponent(name)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && data.results.length > 0) {
+                        const students = data.results;
+                        
+                        if (students.length === 1) {
+                            showModal(students[0].rollNo, students[0].imagePath ? `/${students[0].imagePath}` : null);
+                        } else {
+                            showStudentSelectionModal(students.map(student => ({
+                                rollNo: student.rollNo,
+                                imagePath: student.imagePath,
+                                name: student.name || 'Unknown'
+                            })));
+                        }
+                    } else {
+                        alert('No students found with this name');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error searching by name:', error);
+                    alert('Error searching. Please try again.');
+                });
+        }
+
+        function showStudentSelectionModal(students) {
+            const selectionModal = document.createElement('div');
+            selectionModal.className = 'modal';
+            selectionModal.style.display = 'flex';
+            selectionModal.innerHTML = `
+                <div class="modal-content" style="width: 80%; max-width: 600px;">
+                    <h2>Multiple Students Found</h2>
+                    <p>Please select a student:</p>
+                    <div class="student-list" style="max-height: 400px; overflow-y: auto;"></div>
+                    <button class="btn btn-danger" style="margin-top: 15px;">Cancel</button>
+                </div>
+            `;
+            const studentList = selectionModal.querySelector('.student-list');
+            students.forEach(student => {
+                const studentItem = document.createElement('div');
+                studentItem.style.cssText = 'display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #ddd; cursor: pointer;';
+                let imgHtml = '';
+                if (student.imagePath) {
+                    imgHtml = `<img src="/${student.imagePath}" style="width: 50px; height: 50px; margin-right: 15px; object-fit: cover;">`;
+                } else {
+                    imgHtml = `<div style="width: 50px; height: 50px; margin-right: 15px; background-color: #eee; display: flex; align-items: center; justify-content: center;">No img</div>`;
+                }
+                studentItem.innerHTML = `
+                    ${imgHtml}
+                    <div>
+                        <div><strong>${student.name}</strong></div>
+                        <div>${student.rollNo}</div>
+                    </div>
+                `;
+                studentItem.addEventListener('click', () => {
+                    document.body.removeChild(selectionModal);
+                    showModal(student.rollNo, student.imagePath ? `/${student.imagePath}` : '');
+                });
+                studentList.appendChild(studentItem);
+            });
+            selectionModal.querySelector('button').addEventListener('click', () => {
+                document.body.removeChild(selectionModal);
+            });
+            document.body.appendChild(selectionModal);
+        }
+
         document.getElementById('close-modal').addEventListener('click', () => {
             document.getElementById('image-modal').style.display = 'none';
         });
@@ -566,12 +595,12 @@ function showStudentSelectionModal(students) {
         });
         document.getElementById('apply-filters').addEventListener('click', updateGallery);
         document.getElementById('reset-filters').addEventListener('click', () => {
-    document.getElementById('gender-filter').value = '';
-    document.getElementById('department-filter').value = '';
-    document.getElementById('program-filter').value = '';
-    document.getElementById('batch-filter').value = '';
-    updateGallery();
-});
+            document.getElementById('gender-filter').value = '';
+            document.getElementById('department-filter').value = '';
+            document.getElementById('program-filter').value = '';
+            document.getElementById('batch-filter').value = '';
+            updateGallery();
+        });
         document.getElementById('search-btn').addEventListener('click', searchStudent);
         document.getElementById('search-input').addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
@@ -583,71 +612,72 @@ function showStudentSelectionModal(students) {
         updateGallery();
 
         document.getElementById('face-input').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const previewImg = document.getElementById('preview-image');
-            previewImg.src = e.target.result;
-            document.getElementById('face-preview').style.display = 'block';
-            document.getElementById('face-results').style.display = 'none';
-        };
-        reader.readAsDataURL(file);
-    }
-});
-document.getElementById('face-upload-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    
-    const fileInput = document.getElementById('face-input');
-    if (!fileInput.files.length) {
-        alert('Please select an image to upload');
-        return;
-    }
-    
-    const formData = new FormData();
-    formData.append('image', fileInput.files[0]);
-    const resultsContainer = document.getElementById('face-results-container');
-    resultsContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center;">Processing image...</div>';
-    document.getElementById('face-results').style.display = 'block';
-    
-    fetch('/search-by-face', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        resultsContainer.innerHTML = '';
-        
-        if (data.status === 'success' && data.matches.length > 0) {
-            data.matches.forEach(match => {
-                const container = document.createElement('div');
-                container.className = 'image-container';
-                container.style.height = 'auto';
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewImg = document.getElementById('preview-image');
+                    previewImg.src = e.target.result;
+                    document.getElementById('face-preview').style.display = 'block';
+                    document.getElementById('face-results').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('face-upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const fileInput = document.getElementById('face-input');
+            if (!fileInput.files.length) {
+                alert('Please select an image to upload');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            const resultsContainer = document.getElementById('face-results-container');
+            resultsContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center;">Processing image...</div>';
+            document.getElementById('face-results').style.display = 'block';
+            
+            fetch('/search-by-face', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultsContainer.innerHTML = '';
                 
-                const matchHtml = `
-                    <img src="/${match.imagePath}" alt="Student ${match.rollNo}" 
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="image-error" style="display:none;">Image not available</div>
-                    <div style="padding: 5px; text-align: center;">
-                        <div>${match.name || 'Unknown'}</div>
-                        <div>${match.rollNo}</div>
-                        <div>Match: ${Math.round(match.confidence * 100)}%</div>
-                    </div>
-                `;
-                
-                container.innerHTML = matchHtml;
-                container.addEventListener('click', () => showModal(match.rollNo, `/${match.imagePath}`));
-                resultsContainer.appendChild(container);
+                if (data.status === 'success' && data.matches.length > 0) {
+                    data.matches.forEach(match => {
+                        const container = document.createElement('div');
+                        container.className = 'image-container';
+                        container.style.height = 'auto';
+                        
+                        const matchHtml = `
+                            <img src="/${match.imagePath}" alt="Student ${match.rollNo}" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="image-error" style="display:none;">Image not available</div>
+                            <div style="padding: 5px; text-align: center;">
+                                <div>${match.name || 'Unknown'}</div>
+                                <div>${match.rollNo}</div>
+                                <div>Match: ${Math.round(match.confidence * 100)}%</div>
+                            </div>
+                        `;
+                        
+                        container.innerHTML = matchHtml;
+                        container.addEventListener('click', () => showModal(match.rollNo, `/${match.imagePath}`));
+                        resultsContainer.appendChild(container);
+                    });
+                } else {
+                    resultsContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center;">No matching faces found</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error searching by face:', error);
+                resultsContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center;">Error processing image</div>';
             });
-        } else {
-            resultsContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center;">No matching faces found</div>';
-        }
-    })
-    .catch(error => {
-        console.error('Error searching by face:', error);
-        resultsContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center;">Error processing image</div>';
-    });
-});
+        });
     </script>
 </body>
 </html>
